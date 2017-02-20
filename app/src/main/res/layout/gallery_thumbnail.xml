@@ -6,11 +6,10 @@
 
     <ImageView
         android:id="@+id/thumbnail"
-        android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        android:background="@drawable/shape"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitXY" />
+
 
 </com.death.yttorrents.SquareLayout>

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private String TAG = MainActivity.class.getSimpleName();
-    private static final String endpoint = "https://yts.ag/api/v2/list_movies.json";
+    private static final String endpoint = "https://yts.ag/api/v2/list_movies.json?limit=50";
     private ArrayList<Image> images;
     private ProgressDialog pDialog;
     private GalleryAdapter mAdapter;
