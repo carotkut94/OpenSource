@@ -4,11 +4,11 @@
 
     <item android:id="@+id/search"
         android:title="search"
-        android:icon="@drawable/searchicon"
+        android:icon="@drawable/ic_search"
         app:showAsAction="collapseActionView|ifRoom" />
     <item
         app:showAsAction="always"
-        android:icon="@drawable/seedfilder"
+        android:icon="@drawable/ic_sort"
         android:id="@+id/seedr"
         android:title="seed"/>
 

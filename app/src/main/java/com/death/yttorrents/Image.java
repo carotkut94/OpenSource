@@ -13,6 +13,16 @@ public class Image implements Serializable{
     private String small, medium, large;
     private String timestamp;
 
+    public String getSumary() {
+        return sumary;
+    }
+
+    public void setSumary(String sumary) {
+        this.sumary = sumary;
+    }
+
+    private String sumary;
+
     public Image() {
     }
 

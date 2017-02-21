@@ -2,6 +2,7 @@ package com.death.yttorrents;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.os.Environment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,16 +22,36 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
 public class SlideshowDialogFragment extends DialogFragment {
+    Button download;
+    String dirDownloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/";
     private String TAG = SlideshowDialogFragment.class.getSimpleName();
     private ArrayList<Image> images;
     private ViewPager viewPager;
     private MyViewPagerAdapter myViewPagerAdapter;
-    Button download;
     private TextView lblCount, lblTitle, lblDate, lbRating;
+    //	page change listener
+    ViewPager.OnPageChangeListener viewPagerPageChangeListener = new ViewPager.OnPageChangeListener() {
+
+        @Override
+        public void onPageSelected(int position) {
+            displayMetaInfo(position);
+        }
+
+        @Override
+        public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int arg0) {
+
+        }
+    };
     private int selectedPosition = 0;
 
     static SlideshowDialogFragment newInstance() {
@@ -65,48 +87,34 @@ public class SlideshowDialogFragment extends DialogFragment {
         displayMetaInfo(selectedPosition);
     }
 
-    //	page change listener
-    ViewPager.OnPageChangeListener viewPagerPageChangeListener = new ViewPager.OnPageChangeListener() {
-
-        @Override
-        public void onPageSelected(int position) {
-            displayMetaInfo(position);
-        }
-
-        @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int arg0) {
-
-        }
-    };
-
     private void displayMetaInfo(int position) {
         lblCount.setText((position + 1) + " of " + images.size());
         Image image = images.get(position);
         lblTitle.setText(image.getName());
-        final String url2 =  image.getURL();
+        final String url2 = image.getURL();
         lblDate.setText(image.getTimestamp());
-        lbRating.setText("Rating : "+image.getRating());
+        lbRating.setText(image.getRating());
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String url = url2;
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                 request.setDescription("Downloading torrent");
-                request.setTitle(url2);
+                request.setTitle(lblTitle.getText().toString());
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                     request.allowScanningByMediaScanner();
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 }
+                File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                Uri downloadLocation = Uri.fromFile(new File(dir, lblTitle.getText().toString() + ".torrent"));
                 //request.setDestinationInExternalPublicDir(Environment.getExternalStorageDirectory(), "name-of-the-file.ext");
-                request.setDestinationInExternalFilesDir(getContext(), Environment.getExternalStorageState(),url+".torrent");
+                request.setDestinationUri(downloadLocation);
                 DownloadManager manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
                 manager.enqueue(request);
-                Toast.makeText(getContext(), "Torrent Downloaded", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Torrent Downloading", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -134,13 +142,32 @@ public class SlideshowDialogFragment extends DialogFragment {
 
             ImageView imageViewPreview = (ImageView) view.findViewById(R.id.image_preview);
 
-            Image image = images.get(position);
+            final Image image = images.get(position);
 
             Glide.with(getActivity()).load(image.getLarge())
                     .thumbnail(0.5f)
                     .crossFade()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(imageViewPreview);
+
+            imageViewPreview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                    alertDialogBuilder.setTitle(image.getName());
+                    alertDialogBuilder.setMessage(image.getSumary());
+                    alertDialogBuilder.setIcon(R.drawable.ic_icon);
+                    alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                                    int id) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
+            });
 
             container.addView(view);
 

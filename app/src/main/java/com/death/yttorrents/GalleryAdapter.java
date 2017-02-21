@@ -8,8 +8,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -24,7 +28,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public ImageView thumbnail;
-
+        public TextView textViewTitle;
+        public TextView textViewSummary;
         public MyViewHolder(View view) {
             super(view);
             thumbnail = (ImageView) view.findViewById(R.id.thumbnail);

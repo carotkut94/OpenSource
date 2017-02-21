@@ -1,17 +1,23 @@
 package com.death.yttorrents;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -49,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        haveStoragePermission();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -61,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new GalleryAdapter(getApplicationContext(), images);
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+        //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
@@ -86,6 +93,29 @@ public class MainActivity extends AppCompatActivity {
         fetchImages(endpoint);
     }
 
+
+    public boolean haveStoragePermission() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.e("Permission error", "You have permission");
+                return true;
+            } else {
+                Log.e("Permission error", "You have asked for permission");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                return false;
+            }
+        } else { //you dont need to worry about these stuff below api level 23
+            Log.e("Permission error", "You already have the permission");
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.topbar,menu);
@@ -108,15 +138,11 @@ public class MainActivity extends AppCompatActivity {
             View dialogView = li.inflate(R.layout.custom_query, null);
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                     MainActivity.this);
-            // set title
             alertDialogBuilder.setTitle("Search Movie");
-            // set custom dialog icon
             alertDialogBuilder.setIcon(R.drawable.ic_icon);
-            // set custom_dialog.xml to alertdialog builder
             alertDialogBuilder.setView(dialogView);
             final EditText userInput = (EditText) dialogView
                     .findViewById(R.id.et_input);
-            // set dialog message
             alertDialogBuilder
                     .setCancelable(false)
                     .setPositiveButton("OK",
@@ -160,24 +186,17 @@ public class MainActivity extends AppCompatActivity {
                             {
                                 JSONObject object2 = array.getJSONObject(i);
                                 Image image = new Image();
-                                Log.e("ERROR",object2.getString("title"));
                                 image.setName(object2.getString("title"));
-                                Log.e("ERROR2", object2.getString("date_uploaded"));
-                                Log.e("ERROR3", object2.getString("small_cover_image"));
-                                Log.e("ERROR4", object2.getString("medium_cover_image"));
-                                Log.e("ERROR5", object2.getString("large_cover_image"));
-                                Log.e("ERROR6", object2.getString("rating"));
                                 image.setSmall(object2.getString("small_cover_image"));
                                 image.setMedium(object2.getString("medium_cover_image"));
                                 image.setLarge(object2.getString("large_cover_image"));
                                 image.setTimestamp(object2.getString("date_uploaded"));
                                 image.setRating(object2.getString("rating"));
+                                image.setSumary(object2.getString("synopsis"));
                                 JSONArray array3 = object2.getJSONArray("torrents");
                                 JSONObject jsonObject = array3.getJSONObject(0);
-                                Log.e("URL:",jsonObject.getString("url"));
                                 image.setURL(jsonObject.getString("url"));
                                 images.add(image);
-
                             }
                             pDialog.hide();
                         } catch (JSONException e) {
