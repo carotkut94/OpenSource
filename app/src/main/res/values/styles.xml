@@ -22,4 +22,9 @@
         <item name="colorButtonNormal">@color/colorPrimaryRed</item>
         <item name="colorControlHighlight">@color/colorAccent</item>
     </style>
+
+    <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:colorAccent">@color/colorAccent2</item>
+    </style>
 </resources>

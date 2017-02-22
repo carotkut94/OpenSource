@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
     <item android:id="@+id/search"
         android:title="search"
         android:icon="@drawable/ic_search"
         app:showAsAction="collapseActionView|ifRoom" />
     <item
         app:showAsAction="always"
-        android:icon="@drawable/ic_sort"
+        android:icon="@drawable/ic_action_arrow_upward"
         android:id="@+id/seedr"
-        android:title="seed"/>
-
-
-
+        android:title="Top 50"/>
 </menu>

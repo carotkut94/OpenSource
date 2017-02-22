@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
             LayoutInflater li = LayoutInflater.from(MainActivity.this);
             View dialogView = li.inflate(R.layout.custom_query, null);
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                    MainActivity.this);
+                    MainActivity.this, R.style.MyDialogTheme);
             alertDialogBuilder.setTitle("Search Movie");
             alertDialogBuilder.setIcon(R.drawable.ic_icon);
             alertDialogBuilder.setView(dialogView);
@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
                             pDialog.hide();
                         } catch (JSONException e) {
                             e.printStackTrace();
+
                         }
                         mAdapter.notifyDataSetChanged();
                         pDialog.hide();
