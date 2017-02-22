@@ -3,6 +3,7 @@ package com.death.yttorrents;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,9 +30,9 @@ import java.util.ArrayList;
 
 public class SlideshowDialogFragment extends DialogFragment {
     Button download;
-    String dirDownloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/";
-    private String TAG = SlideshowDialogFragment.class.getSimpleName();
+    Boolean setFitCenter;
     private ArrayList<Image> images;
+
     private ViewPager viewPager;
     private MyViewPagerAdapter myViewPagerAdapter;
     private TextView lblCount, lblTitle, lblDate, lbRating;
@@ -59,6 +61,8 @@ public class SlideshowDialogFragment extends DialogFragment {
         return f;
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,6 +82,13 @@ public class SlideshowDialogFragment extends DialogFragment {
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener);
 
         setCurrentItem(selectedPosition);
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setFitCenter = true;
+        }
+        else {
+            setFitCenter = false;
+        }
 
         return v;
     }
@@ -144,11 +155,26 @@ public class SlideshowDialogFragment extends DialogFragment {
 
             final Image image = images.get(position);
 
-            Glide.with(getActivity()).load(image.getLarge())
-                    .thumbnail(0.5f)
-                    .crossFade()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(imageViewPreview);
+
+            if(setFitCenter)
+            {
+                imageViewPreview.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                Glide.with(getActivity()).load(image.getLarge())
+                        .thumbnail(0.5f)
+                        .crossFade()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(imageViewPreview);
+                Log.e("LAYOUT","Landscape");
+
+            }else
+            {
+                imageViewPreview.setScaleType(ImageView.ScaleType.FIT_XY);
+                Glide.with(getActivity()).load(image.getLarge())
+                        .thumbnail(0.5f)
+                        .crossFade()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(imageViewPreview);
+            }
 
             imageViewPreview.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -175,6 +201,8 @@ public class SlideshowDialogFragment extends DialogFragment {
 
             return view;
         }
+
+
 
         @Override
         public int getCount() {

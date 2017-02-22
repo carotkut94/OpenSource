@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -43,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Image> images;
     private ProgressDialog pDialog;
     private GalleryAdapter mAdapter;
+    OrientationEventListener mOrientationEventListener;
     private TextView errorView;
+    RecyclerView.LayoutManager mLayoutManager;
     int count = 0;
     String query;
     private RecyclerView recyclerView;
@@ -63,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         images = new ArrayList<>();
         mAdapter = new GalleryAdapter(getApplicationContext(), images);
 
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+        mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
         //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -87,8 +91,41 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }));
+
+
+
+            mOrientationEventListener = new OrientationEventListener(this,
+                SensorManager.SENSOR_DELAY_NORMAL) {
+
+            @Override
+            public void onOrientationChanged(int orientation) {
+                Log.e("ORIENTATION",
+                        "Orientation changed to " + orientation);
+                if(orientation==270||orientation==90)
+                {
+                    mLayoutManager = new GridLayoutManager(getApplicationContext(), 4);
+                    //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+                    recyclerView.setLayoutManager(mLayoutManager);
+                }
+                else
+                {
+                    mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+                    //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+                    recyclerView.setLayoutManager(mLayoutManager);
+                }
+            }
+        };
+        if (mOrientationEventListener.canDetectOrientation() == true) {
+            Log.v("TRUE", "Can detect orientation");
+            mOrientationEventListener.enable();
+        } else {
+            Log.v("FALSE", "Cannot detect orientation");
+            mOrientationEventListener.disable();
+        }
         fetchMovies(endpoint);
     }
+
+
 
 
     public boolean haveStoragePermission() {
