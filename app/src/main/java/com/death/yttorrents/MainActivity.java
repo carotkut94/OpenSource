@@ -42,14 +42,14 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private static final String endpoint = "https://yts.ag/api/v2/list_movies.json?limit=50";
-    private ArrayList<Image> images;
-    private ProgressDialog pDialog;
-    private GalleryAdapter mAdapter;
     OrientationEventListener mOrientationEventListener;
-    private TextView errorView;
     RecyclerView.LayoutManager mLayoutManager;
     int count = 0;
     String query;
+    private ArrayList<Image> images;
+    private ProgressDialog pDialog;
+    private GalleryAdapter mAdapter;
+    private TextView errorView;
     private RecyclerView recyclerView;
 
     @Override
@@ -93,22 +93,18 @@ public class MainActivity extends AppCompatActivity {
         }));
 
 
-
-            mOrientationEventListener = new OrientationEventListener(this,
+        mOrientationEventListener = new OrientationEventListener(this,
                 SensorManager.SENSOR_DELAY_NORMAL) {
 
             @Override
             public void onOrientationChanged(int orientation) {
                 Log.e("ORIENTATION",
                         "Orientation changed to " + orientation);
-                if(orientation==270||orientation==90)
-                {
+                if (isLandscape(orientation)) {
                     mLayoutManager = new GridLayoutManager(getApplicationContext(), 4);
                     //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
                     recyclerView.setLayoutManager(mLayoutManager);
-                }
-                else
-                {
+                } else {
                     mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
                     //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
                     recyclerView.setLayoutManager(mLayoutManager);
@@ -122,10 +118,14 @@ public class MainActivity extends AppCompatActivity {
             Log.v("FALSE", "Cannot detect orientation");
             mOrientationEventListener.disable();
         }
+
+
         fetchMovies(endpoint);
     }
 
-
+    private boolean isLandscape(int orientation) {
+        return (orientation > 135 && orientation <= 270) || (orientation > 45 && orientation < 135);
+    }
 
 
     public boolean haveStoragePermission() {
@@ -152,27 +152,25 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.topbar,menu);
+        getMenuInflater().inflate(R.menu.topbar, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.seedr)
-        {
-            count+=1;
-            Toast.makeText(MainActivity.this, "Sorting by minimum rating 8 on page "+count, Toast.LENGTH_SHORT).show();
-            String url = "https://yts.ag/api/v2/list_movies.json?minimum_rating=8&limit=50&page="+count;
+        if (item.getItemId() == R.id.seedr) {
+            count += 1;
+            Toast.makeText(MainActivity.this, "Sorting by minimum rating 8 on page " + count, Toast.LENGTH_SHORT).show();
+            String url = "https://yts.ag/api/v2/list_movies.json?minimum_rating=8&limit=50&page=" + count;
             fetchMovies(url);
         }
-        if(item.getItemId()==R.id.search)
-        {
+        if (item.getItemId() == R.id.search) {
             count = 0;
             LayoutInflater li = LayoutInflater.from(MainActivity.this);
-            View dialogView = li.inflate(R.layout.custom_query,null);
+            View dialogView = li.inflate(R.layout.custom_query, null);
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                     MainActivity.this, R.style.MyDialogTheme);
-            alertDialogBuilder.setTitle( Html.fromHtml("<font color='#ffffff'>Search Movie</font>"));
+            alertDialogBuilder.setTitle(Html.fromHtml("<font color='#ffffff'>Search Movie</font>"));
             alertDialogBuilder.setIcon(R.drawable.ic_icon);
             alertDialogBuilder.setView(dialogView);
             final EditText userInput = (EditText) dialogView
@@ -184,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog,
                                                     int id) {
                                     query = userInput.getText().toString();
-                                    String dataUrl = "https://yts.ag/api/v2/list_movies.json?query_term="+query+"&limit=30";
+                                    String dataUrl = "https://yts.ag/api/v2/list_movies.json?query_term=" + query + "&limit=30";
                                     fetchMovies(dataUrl);
                                 }
                             })
@@ -216,8 +214,7 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             JSONObject object = response.getJSONObject("data");
                             JSONArray array = object.getJSONArray("movies");
-                            for(int i=0;i<array.length();i++)
-                            {
+                            for (int i = 0; i < array.length(); i++) {
                                 JSONObject object2 = array.getJSONObject(i);
                                 Image image = new Image();
                                 image.setName(object2.getString("title"));

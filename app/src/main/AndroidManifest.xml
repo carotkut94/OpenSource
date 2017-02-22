@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="sensor"
             android:configChanges="density|fontScale|keyboard|orientation|screenLayout|screenSize"
             >
             <intent-filter>
