@@ -2,10 +2,7 @@ package com.death.yttorrents;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
@@ -17,16 +14,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -42,12 +39,12 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String TAG = MainActivity.class.getSimpleName();
     private static final String endpoint = "https://yts.ag/api/v2/list_movies.json?limit=50";
     private ArrayList<Image> images;
     private ProgressDialog pDialog;
     private GalleryAdapter mAdapter;
-    static  int count = 0;
+    private TextView errorView;
+    int count = 0;
     String query;
     private RecyclerView recyclerView;
 
@@ -61,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setTitle("YTtorrents");
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
+        errorView = (TextView) findViewById(R.id.error);
         pDialog = new ProgressDialog(this);
         images = new ArrayList<>();
         mAdapter = new GalleryAdapter(getApplicationContext(), images);
@@ -90,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }));
-        fetchImages(endpoint);
+        fetchMovies(endpoint);
     }
 
 
@@ -129,16 +126,16 @@ public class MainActivity extends AppCompatActivity {
             count+=1;
             Toast.makeText(MainActivity.this, "Sorting by minimum rating 8 on page "+count, Toast.LENGTH_SHORT).show();
             String url = "https://yts.ag/api/v2/list_movies.json?minimum_rating=8&limit=50&page="+count;
-            fetchImages(url);
+            fetchMovies(url);
         }
         if(item.getItemId()==R.id.search)
         {
-
+            count = 0;
             LayoutInflater li = LayoutInflater.from(MainActivity.this);
-            View dialogView = li.inflate(R.layout.custom_query, null);
+            View dialogView = li.inflate(R.layout.custom_query,null);
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                     MainActivity.this, R.style.MyDialogTheme);
-            alertDialogBuilder.setTitle("Search Movie");
+            alertDialogBuilder.setTitle( Html.fromHtml("<font color='#ffffff'>Search Movie</font>"));
             alertDialogBuilder.setIcon(R.drawable.ic_icon);
             alertDialogBuilder.setView(dialogView);
             final EditText userInput = (EditText) dialogView
@@ -151,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                                                     int id) {
                                     query = userInput.getText().toString();
                                     String dataUrl = "https://yts.ag/api/v2/list_movies.json?query_term="+query+"&limit=30";
-                                    fetchImages(dataUrl);
+                                    fetchMovies(dataUrl);
                                 }
                             })
                     .setNegativeButton("Cancel",
@@ -161,24 +158,24 @@ public class MainActivity extends AppCompatActivity {
                                     dialog.cancel();
                                 }
                             });
-            // create alert dialog
             AlertDialog alertDialog = alertDialogBuilder.create();
-            // show it
             alertDialog.show();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void fetchImages(String url) {
+    private void fetchMovies(String url) {
         pDialog.setMessage("Downloading json...");
         pDialog.show();
-
+        errorView.setVisibility(View.INVISIBLE);
         JsonObjectRequest request = new JsonObjectRequest(url, new JSONObject(),
                 new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
                         images.clear();
+                        pDialog.hide();
+                        errorView.setVisibility(View.INVISIBLE);
                         try {
                             JSONObject object = response.getJSONObject("data");
                             JSONArray array = object.getJSONArray("movies");
@@ -198,19 +195,18 @@ public class MainActivity extends AppCompatActivity {
                                 image.setURL(jsonObject.getString("url"));
                                 images.add(image);
                             }
-                            pDialog.hide();
                         } catch (JSONException e) {
                             e.printStackTrace();
-
+                            errorView.setVisibility(View.VISIBLE);
                         }
                         mAdapter.notifyDataSetChanged();
-                        pDialog.hide();
                     }
 
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("Error: ", error.getMessage());
+                errorView.setVisibility(View.VISIBLE);
                 pDialog.hide();
             }
         });

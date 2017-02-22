@@ -153,8 +153,9 @@ public class SlideshowDialogFragment extends DialogFragment {
             imageViewPreview.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme);
                     alertDialogBuilder.setTitle(image.getName());
+                    alertDialogBuilder.setCancelable(true);
                     alertDialogBuilder.setMessage(image.getSumary());
                     alertDialogBuilder.setIcon(R.drawable.ic_icon);
                     alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
@@ -165,6 +166,7 @@ public class SlideshowDialogFragment extends DialogFragment {
                                 }
                             });
                     AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setCancelable(true);
                     alertDialog.show();
                 }
             });
