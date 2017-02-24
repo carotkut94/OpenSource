@@ -31,12 +31,15 @@ import java.util.ArrayList;
 public class SlideshowDialogFragment extends DialogFragment {
     Button download;
     Boolean setFitCenter;
-    private ArrayList<Image> images;
+    private ArrayList<Movie> movies;
 
     private ViewPager viewPager;
     private MyViewPagerAdapter myViewPagerAdapter;
     private TextView lblCount, lblTitle, lblDate, lbRating;
     //	page change listener
+    /**
+     * Viewpager change listener
+     */
     ViewPager.OnPageChangeListener viewPagerPageChangeListener = new ViewPager.OnPageChangeListener() {
 
         @Override
@@ -48,7 +51,6 @@ public class SlideshowDialogFragment extends DialogFragment {
         public void onPageScrolled(int arg0, float arg1, int arg2) {
 
         }
-
         @Override
         public void onPageScrollStateChanged(int arg0) {
 
@@ -56,13 +58,23 @@ public class SlideshowDialogFragment extends DialogFragment {
     };
     private int selectedPosition = 0;
 
+    /**
+     * For making a new instance of fragment
+     * @return
+     */
     static SlideshowDialogFragment newInstance() {
         SlideshowDialogFragment f = new SlideshowDialogFragment();
         return f;
     }
 
 
-
+    /**
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,7 +86,7 @@ public class SlideshowDialogFragment extends DialogFragment {
         lbRating = (TextView) v.findViewById(R.id.rating);
         download = (Button) v.findViewById(R.id.download);
 
-        images = (ArrayList<Image>) getArguments().getSerializable("images");
+        movies = (ArrayList<Movie>) getArguments().getSerializable("movies");
         selectedPosition = getArguments().getInt("position");
 
         myViewPagerAdapter = new MyViewPagerAdapter();
@@ -93,18 +105,26 @@ public class SlideshowDialogFragment extends DialogFragment {
         return v;
     }
 
+    /**
+     * displaying current item from movie array
+     * @param position
+     */
     private void setCurrentItem(int position) {
         viewPager.setCurrentItem(position, false);
         displayMetaInfo(selectedPosition);
     }
 
+    /**
+     * Dispay the movie data on fragment
+     * @param position
+     */
     private void displayMetaInfo(int position) {
-        lblCount.setText((position + 1) + " of " + images.size());
-        Image image = images.get(position);
-        lblTitle.setText(image.getName());
-        final String url2 = image.getURL();
-        lblDate.setText(image.getTimestamp());
-        lbRating.setText(image.getRating());
+        lblCount.setText((position + 1) + " of " + movies.size());
+        Movie movie = movies.get(position);
+        lblTitle.setText(movie.getName());
+        final String url2 = movie.getURL();
+        lblDate.setText(movie.getTimestamp());
+        lbRating.setText(movie.getRating());
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,6 +158,10 @@ public class SlideshowDialogFragment extends DialogFragment {
     }
 
     //	adapter
+
+    /**
+     * Pager Adapter
+     */
     public class MyViewPagerAdapter extends PagerAdapter {
 
         private LayoutInflater layoutInflater;
@@ -153,13 +177,13 @@ public class SlideshowDialogFragment extends DialogFragment {
 
             ImageView imageViewPreview = (ImageView) view.findViewById(R.id.image_preview);
 
-            final Image image = images.get(position);
+            final Movie movie = movies.get(position);
 
 
             if(setFitCenter)
             {
                 imageViewPreview.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                Glide.with(getActivity()).load(image.getLarge())
+                Glide.with(getActivity()).load(movie.getLarge())
                         .thumbnail(0.5f)
                         .crossFade()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -169,7 +193,7 @@ public class SlideshowDialogFragment extends DialogFragment {
             }else
             {
                 imageViewPreview.setScaleType(ImageView.ScaleType.FIT_XY);
-                Glide.with(getActivity()).load(image.getLarge())
+                Glide.with(getActivity()).load(movie.getLarge())
                         .thumbnail(0.5f)
                         .crossFade()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -180,9 +204,9 @@ public class SlideshowDialogFragment extends DialogFragment {
                 @Override
                 public void onClick(View view) {
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme);
-                    alertDialogBuilder.setTitle(image.getName());
+                    alertDialogBuilder.setTitle(movie.getName());
                     alertDialogBuilder.setCancelable(true);
-                    alertDialogBuilder.setMessage(image.getSumary());
+                    alertDialogBuilder.setMessage(movie.getSumary());
                     alertDialogBuilder.setIcon(R.drawable.ic_icon);
                     alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
                             new DialogInterface.OnClickListener() {
@@ -206,7 +230,7 @@ public class SlideshowDialogFragment extends DialogFragment {
 
         @Override
         public int getCount() {
-            return images.size();
+            return movies.size();
         }
 
         @Override

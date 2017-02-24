@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by Lincoln on 04/04/16.
  */
-public class Image implements Serializable{
+public class Movie implements Serializable{
     private String name;
     private String URL;
 
@@ -23,10 +23,10 @@ public class Image implements Serializable{
 
     private String sumary;
 
-    public Image() {
+    public Movie() {
     }
 
-    public Image(String name, String small, String medium, String large, String timestamp,String URL, String rating) {
+    public Movie(String name, String small, String medium, String large, String timestamp, String URL, String rating) {
         this.name = name;
         this.small = small;
         this.medium = medium;

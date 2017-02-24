@@ -7,7 +7,7 @@
     <ImageView
         android:id="@+id/thumbnail"
         android:layout_width="match_parent"
-        android:layout_height="250sp"
+        android:layout_height="280sp"
         android:adjustViewBounds="true"
         android:scaleType="fitXY" />
 

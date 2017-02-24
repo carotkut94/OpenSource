@@ -3,9 +3,10 @@ package com.death.yttorrents;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Color;
-import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -42,16 +43,18 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private static final String endpoint = "https://yts.ag/api/v2/list_movies.json?limit=50";
-    OrientationEventListener mOrientationEventListener;
     RecyclerView.LayoutManager mLayoutManager;
     int count = 0;
     String query;
-    private ArrayList<Image> images;
+    private ArrayList<Movie> movies;
     private ProgressDialog pDialog;
     private GalleryAdapter mAdapter;
     private TextView errorView;
     private RecyclerView recyclerView;
 
+    /**
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,22 +67,23 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         errorView = (TextView) findViewById(R.id.error);
         pDialog = new ProgressDialog(this);
-        images = new ArrayList<>();
-        mAdapter = new GalleryAdapter(getApplicationContext(), images);
+        movies = new ArrayList<>();
+        mAdapter = new GalleryAdapter(getApplicationContext(), movies);
 
         mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
-        //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
+        /**
+         * Click event handler on recycler view.
+         */
         recyclerView.addOnItemTouchListener(new GalleryAdapter.RecyclerTouchListener(getApplicationContext(), recyclerView, new GalleryAdapter.ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("images", images);
+                bundle.putSerializable("movies", movies);
                 bundle.putInt("position", position);
-
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 SlideshowDialogFragment newFragment = SlideshowDialogFragment.newInstance();
                 newFragment.setArguments(bundle);
@@ -91,43 +95,29 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }));
-
-
-        mOrientationEventListener = new OrientationEventListener(this,
-                SensorManager.SENSOR_DELAY_NORMAL) {
-
-            @Override
-            public void onOrientationChanged(int orientation) {
-                Log.e("ORIENTATION",
-                        "Orientation changed to " + orientation);
-                if (isLandscape(orientation)) {
-                    mLayoutManager = new GridLayoutManager(getApplicationContext(), 4);
-                    //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
-                    recyclerView.setLayoutManager(mLayoutManager);
-                } else {
-                    mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
-                    //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
-                    recyclerView.setLayoutManager(mLayoutManager);
-                }
-            }
-        };
-        if (mOrientationEventListener.canDetectOrientation() == true) {
-            Log.v("TRUE", "Can detect orientation");
-            mOrientationEventListener.enable();
-        } else {
-            Log.v("FALSE", "Cannot detect orientation");
-            mOrientationEventListener.disable();
-        }
-
-
         fetchMovies(endpoint);
     }
 
-    private boolean isLandscape(int orientation) {
-        return (orientation > 135 && orientation <= 270) || (orientation > 45 && orientation < 135);
+    /**
+     * @param newConfig
+     */
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mLayoutManager = new GridLayoutManager(getApplicationContext(), 4);
+            recyclerView.setLayoutManager(mLayoutManager);
+        } else {
+            mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+            recyclerView.setLayoutManager(mLayoutManager);
+        }
+        super.onConfigurationChanged(newConfig);
     }
 
-
+    /**
+     * Check for write permissions
+     *
+     * @return
+     */
     public boolean haveStoragePermission() {
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -145,17 +135,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    /**
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.topbar, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.seedr) {
@@ -177,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                     .findViewById(R.id.et_input);
             alertDialogBuilder
                     .setCancelable(false)
-                    .setPositiveButton("OK",
+                    .setPositiveButton("Search",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog,
                                                     int id) {
@@ -196,19 +199,27 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
+        if(item.getItemId()==R.id.mwiki)
+        {
+            startActivity(new Intent(MainActivity.this, MediaContainer.class));
+        }
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Method for gathering the json data from API
+     *
+     * @param url
+     */
     private void fetchMovies(String url) {
-        pDialog.setMessage("Downloading json...");
+        pDialog.setMessage("Downloading movie list...");
         pDialog.show();
         errorView.setVisibility(View.INVISIBLE);
         JsonObjectRequest request = new JsonObjectRequest(url, new JSONObject(),
                 new Response.Listener<JSONObject>() {
-
                     @Override
                     public void onResponse(JSONObject response) {
-                        images.clear();
+                        movies.clear();
                         pDialog.hide();
                         errorView.setVisibility(View.INVISIBLE);
                         try {
@@ -216,18 +227,18 @@ public class MainActivity extends AppCompatActivity {
                             JSONArray array = object.getJSONArray("movies");
                             for (int i = 0; i < array.length(); i++) {
                                 JSONObject object2 = array.getJSONObject(i);
-                                Image image = new Image();
-                                image.setName(object2.getString("title"));
-                                image.setSmall(object2.getString("small_cover_image"));
-                                image.setMedium(object2.getString("medium_cover_image"));
-                                image.setLarge(object2.getString("large_cover_image"));
-                                image.setTimestamp(object2.getString("date_uploaded"));
-                                image.setRating(object2.getString("rating"));
-                                image.setSumary(object2.getString("synopsis"));
+                                Movie movie = new Movie();
+                                movie.setName(object2.getString("title"));
+                                movie.setSmall(object2.getString("small_cover_image"));
+                                movie.setMedium(object2.getString("medium_cover_image"));
+                                movie.setLarge(object2.getString("large_cover_image"));
+                                movie.setTimestamp(object2.getString("date_uploaded"));
+                                movie.setRating(object2.getString("rating"));
+                                movie.setSumary(object2.getString("synopsis"));
                                 JSONArray array3 = object2.getJSONArray("torrents");
                                 JSONObject jsonObject = array3.getJSONObject(0);
-                                image.setURL(jsonObject.getString("url"));
-                                images.add(image);
+                                movie.setURL(jsonObject.getString("url"));
+                                movies.add(movie);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -235,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                         mAdapter.notifyDataSetChanged();
                     }
-
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -246,6 +256,4 @@ public class MainActivity extends AppCompatActivity {
         });
         AppController.getInstance().addToRequestQueue(request);
     }
-
-
 }

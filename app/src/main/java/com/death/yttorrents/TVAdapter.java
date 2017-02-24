@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -19,18 +18,16 @@ import java.util.List;
  * Created by sidhantrajora on 07/07/16.
 */
 
-public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHolder> {
+public class TVAdapter extends RecyclerView.Adapter<TVAdapter.MyViewHolder> {
 
-    private List<Movie> movies;
+    private List<TVSkeleton> tvSkeletons;
     private Context mContext;
-
+    private String imageURL = "https://image.tmdb.org/t/p/w320";
     /**
      * ViewHolder
      */
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public ImageView thumbnail;
-        public TextView textViewTitle;
-        public TextView textViewSummary;
         public MyViewHolder(View view) {
             super(view);
             thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
@@ -41,11 +38,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
     /**
      *
      * @param context
-     * @param movies
+     * @param tvSkeletons
      */
-    public GalleryAdapter(Context context, List<Movie> movies) {
+    public TVAdapter(Context context, List<TVSkeleton> tvSkeletons) {
         mContext = context;
-        this.movies = movies;
+        this.tvSkeletons = tvSkeletons;
     }
 
     @Override
@@ -58,9 +55,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        Movie movie = movies.get(position);
+        TVSkeleton tv = tvSkeletons.get(position);
 
-        Glide.with(mContext).load(movie.getMedium())
+        Glide.with(mContext).load(imageURL+tv.getPoster_Path())
                 .thumbnail(0.5f)
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -69,7 +66,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
 
     @Override
     public int getItemCount() {
-        return movies.size();
+        return tvSkeletons.size();
     }
 
     public interface ClickListener {
@@ -84,9 +81,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
     public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
         private GestureDetector gestureDetector;
-        private GalleryAdapter.ClickListener clickListener;
+        private TVAdapter.ClickListener clickListener;
 
-        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final GalleryAdapter.ClickListener clickListener) {
+        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final TVAdapter.ClickListener clickListener) {
             this.clickListener = clickListener;
             gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override
