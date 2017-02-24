@@ -29,7 +29,7 @@ public class TVMediaFragment extends DialogFragment {
     private ArrayList<TVSkeleton> tvSkeletons;
     private ViewPager viewPager;
     private MyViewPagerAdapter myViewPagerAdapter;
-    private TextView lblCount, lblTitle, lblDate, lbRating;
+    private TextView lblCount, lblTitle, lblDate, lbRating, lblOverview;
      /**
      * Viewpager change listener
      */
@@ -66,8 +66,7 @@ public class TVMediaFragment extends DialogFragment {
         lblTitle = (TextView) v.findViewById(R.id.title);
         lblDate = (TextView) v.findViewById(R.id.date);
         lbRating = (TextView) v.findViewById(R.id.rating);
-        download = (Button) v.findViewById(R.id.download);
-
+        lblOverview = (TextView) v.findViewById(R.id.textOverView);
         tvSkeletons = (ArrayList<TVSkeleton>) getArguments().getSerializable("tv");
         selectedPosition = getArguments().getInt("position");
 
@@ -95,6 +94,7 @@ public class TVMediaFragment extends DialogFragment {
         TVSkeleton media = tvSkeletons.get(position);
         lblTitle.setText(media.getTitle());
         lbRating.setText(media.getVote_average());
+        lblOverview.setText(media.getOverview().isEmpty()?"N/A":media.getOverview());
     }
 
     @Override

@@ -19,6 +19,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 
@@ -29,7 +31,7 @@ public class TopMediaFragment extends DialogFragment {
     private ArrayList<MediaSkeleton> mediaSkeletons;
     private ViewPager viewPager;
     private MyViewPagerAdapter myViewPagerAdapter;
-    private TextView lblCount, lblTitle, lblDate, lbRating;
+    private TextView lblCount, lblTitle, lblDate, lbRating, lblOverview;
      /**
      * Viewpager change listener
      */
@@ -67,6 +69,7 @@ public class TopMediaFragment extends DialogFragment {
         lblDate = (TextView) v.findViewById(R.id.date);
         lbRating = (TextView) v.findViewById(R.id.rating);
         download = (Button) v.findViewById(R.id.download);
+        lblOverview = (TextView) v.findViewById(R.id.textOverView);
 
         mediaSkeletons = (ArrayList<MediaSkeleton>) getArguments().getSerializable("media");
         selectedPosition = getArguments().getInt("position");
@@ -95,6 +98,7 @@ public class TopMediaFragment extends DialogFragment {
         MediaSkeleton media = mediaSkeletons.get(position);
         lblTitle.setText(media.getTitle());
         lbRating.setText(media.getVote_average());
+        lblOverview.setText(media.getOverview());
     }
 
     @Override

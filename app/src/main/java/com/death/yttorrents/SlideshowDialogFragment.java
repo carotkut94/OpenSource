@@ -12,6 +12,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -204,9 +205,9 @@ public class SlideshowDialogFragment extends DialogFragment {
                 @Override
                 public void onClick(View view) {
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme);
-                    alertDialogBuilder.setTitle(movie.getName());
+                    alertDialogBuilder.setTitle(Html.fromHtml("<font color='#ffffff'>"+movie.getName()+"</font>"));
                     alertDialogBuilder.setCancelable(true);
-                    alertDialogBuilder.setMessage(movie.getSumary());
+                    alertDialogBuilder.setMessage(Html.fromHtml("<font color='#ffffff'>"+movie.getSumary()+"</font>"));
                     alertDialogBuilder.setIcon(R.drawable.ic_icon);
                     alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
                             new DialogInterface.OnClickListener() {
