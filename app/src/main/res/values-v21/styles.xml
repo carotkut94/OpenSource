@@ -1,1 +1,7 @@
-<resources></resources>
+<resources>
+
+    <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@color/teal_900</item>
+        <item name="android:colorAccent">@color/colorAccent2</item>
+    </style>
+</resources>

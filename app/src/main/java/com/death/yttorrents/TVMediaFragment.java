@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 
 public class TVMediaFragment extends DialogFragment {
-    Button download;
     Boolean setFitCenter;
     String URLString = "https://image.tmdb.org/t/p/w";
     private ArrayList<TVSkeleton> tvSkeletons;

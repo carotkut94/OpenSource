@@ -9,6 +9,8 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -88,7 +90,6 @@ public class TopMediaFragment extends DialogFragment {
 
         return v;
     }
-
     private void setCurrentItem(int position) {
         viewPager.setCurrentItem(position, false);
         displayMetaInfo(selectedPosition);
@@ -101,10 +102,12 @@ public class TopMediaFragment extends DialogFragment {
         lblOverview.setText(media.getOverview());
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        setHasOptionsMenu(true);
     }
 
     /**
@@ -123,7 +126,6 @@ public class TopMediaFragment extends DialogFragment {
             layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.media_full_screen_details, container, false);
 
-            Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
             ImageView imageViewPreview = (ImageView) view.findViewById(R.id.image_preview);
 
