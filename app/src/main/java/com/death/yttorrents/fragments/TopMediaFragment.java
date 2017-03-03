@@ -1,4 +1,4 @@
-package com.death.yttorrents;
+package com.death.yttorrents.fragments;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -7,25 +7,26 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.death.yttorrents.R;
+import com.death.yttorrents.model.MediaSkeleton;
 
 import java.util.ArrayList;
 
 
-public class TVMediaFragment extends DialogFragment {
+public class TopMediaFragment extends DialogFragment {
+    Button download;
     Boolean setFitCenter;
     String URLString = "https://image.tmdb.org/t/p/w";
-    private ArrayList<TVSkeleton> tvSkeletons;
+    private ArrayList<MediaSkeleton> mediaSkeletons;
     private ViewPager viewPager;
     private MyViewPagerAdapter myViewPagerAdapter;
     private TextView lblCount, lblTitle, lblDate, lbRating, lblOverview;
@@ -51,8 +52,8 @@ public class TVMediaFragment extends DialogFragment {
     };
     private int selectedPosition = 0;
 
-    static TVMediaFragment newInstance() {
-        TVMediaFragment f = new TVMediaFragment();
+    static TopMediaFragment newInstance() {
+        TopMediaFragment f = new TopMediaFragment();
         return f;
     }
 
@@ -65,8 +66,10 @@ public class TVMediaFragment extends DialogFragment {
         lblTitle = (TextView) v.findViewById(R.id.title);
         lblDate = (TextView) v.findViewById(R.id.date);
         lbRating = (TextView) v.findViewById(R.id.rating);
+        download = (Button) v.findViewById(R.id.download);
         lblOverview = (TextView) v.findViewById(R.id.textOverView);
-        tvSkeletons = (ArrayList<TVSkeleton>) getArguments().getSerializable("tv");
+
+        mediaSkeletons = (ArrayList<MediaSkeleton>) getArguments().getSerializable("media");
         selectedPosition = getArguments().getInt("position");
 
         myViewPagerAdapter = new MyViewPagerAdapter();
@@ -83,23 +86,24 @@ public class TVMediaFragment extends DialogFragment {
 
         return v;
     }
-
     private void setCurrentItem(int position) {
         viewPager.setCurrentItem(position, false);
         displayMetaInfo(selectedPosition);
     }
     private void displayMetaInfo(int position) {
-        lblCount.setText((position + 1) + " of " + tvSkeletons.size());
-        TVSkeleton media = tvSkeletons.get(position);
+        lblCount.setText((position + 1) + " of " + mediaSkeletons.size());
+        MediaSkeleton media = mediaSkeletons.get(position);
         lblTitle.setText(media.getTitle());
         lbRating.setText(media.getVote_average());
-        lblOverview.setText(media.getOverview().isEmpty()?"N/A":media.getOverview());
+        lblOverview.setText(media.getOverview());
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        setHasOptionsMenu(true);
     }
 
     /**
@@ -118,11 +122,10 @@ public class TVMediaFragment extends DialogFragment {
             layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.media_full_screen_details, container, false);
 
-            Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
             ImageView imageViewPreview = (ImageView) view.findViewById(R.id.image_preview);
 
-            final TVSkeleton media = tvSkeletons.get(position);
+            final MediaSkeleton media = mediaSkeletons.get(position);
 
             Log.e("IAMGE LINK CREATED", URLString + "1920" + media.getPoster_Path());
             Glide.with(getActivity()).load(URLString + "1920" + media.getPoster_Path())
@@ -139,7 +142,7 @@ public class TVMediaFragment extends DialogFragment {
 
         @Override
         public int getCount() {
-            return tvSkeletons.size();
+            return mediaSkeletons.size();
         }
 
         @Override

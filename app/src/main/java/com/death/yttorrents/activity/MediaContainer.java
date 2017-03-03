@@ -1,4 +1,4 @@
-package com.death.yttorrents;
+package com.death.yttorrents.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +19,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
+
+import com.death.yttorrents.R;
+import com.death.yttorrents.fragments.MoviesFragment;
+import com.death.yttorrents.fragments.TVFragment;
 
 import java.util.ArrayList;
 import java.util.List;

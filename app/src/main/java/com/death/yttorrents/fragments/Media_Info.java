@@ -1,4 +1,4 @@
-package com.death.yttorrents;
+package com.death.yttorrents.fragments;
 
 import android.app.ProgressDialog;
 import android.graphics.Color;
@@ -10,12 +10,17 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.death.yttorrents.R;
+import com.death.yttorrents.adapter.GalleryAdapter;
+import com.death.yttorrents.adapter.MediaAdapter;
+import com.death.yttorrents.controller.AppController;
+import com.death.yttorrents.fragments.TopMediaFragment;
+import com.death.yttorrents.model.MediaSkeleton;
 
 import org.json.JSONArray;
 import org.json.JSONException;

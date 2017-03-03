@@ -1,9 +1,10 @@
-package com.death.yttorrents;
+package com.death.yttorrents.controller;
 
 /**
  * Created by sidhantrajora on 07/07/16.
  */
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -23,6 +24,14 @@ public class AppController extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+        SharedPreferences preferences = getSharedPreferences("APPCOUNTER", MODE_APPEND);
+        if(!preferences.contains("ISFIRSTRUN"))
+        {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("ISFIRSTRUN", true);
+            editor.apply();
+            editor.commit();
+        }
     }
 
     /**

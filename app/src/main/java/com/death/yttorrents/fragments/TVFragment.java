@@ -1,4 +1,4 @@
-package com.death.yttorrents;
+package com.death.yttorrents.fragments;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -17,6 +17,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.death.yttorrents.R;
+import com.death.yttorrents.adapter.GalleryAdapter;
+import com.death.yttorrents.adapter.TVAdapter;
+import com.death.yttorrents.controller.AppController;
+import com.death.yttorrents.model.TVSkeleton;
 
 import org.json.JSONArray;
 import org.json.JSONException;

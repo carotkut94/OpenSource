@@ -1,4 +1,4 @@
-package com.death.yttorrents;
+package com.death.yttorrents.model;
 
 import java.io.Serializable;
 

@@ -11,7 +11,12 @@
         android:id="@+id/seedr"
         android:title="Top 50"/>
     <item
-        android:title="Media Wiki"
+        android:title="Media Info"
         android:id="@+id/mwiki"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
+    <item
+        android:title="About"
+        android:id="@+id/about"
+        app:showAsAction="never"/>
+
 </menu>

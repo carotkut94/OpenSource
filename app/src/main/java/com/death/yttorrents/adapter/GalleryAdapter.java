@@ -1,4 +1,4 @@
-package com.death.yttorrents;
+package com.death.yttorrents.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,9 +8,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.death.yttorrents.model.Movie;
+import com.death.yttorrents.R;
 
 import java.util.List;
 
@@ -18,16 +21,18 @@ import java.util.List;
  * Created by sidhantrajora on 07/07/16.
 */
 
-public class TVAdapter extends RecyclerView.Adapter<TVAdapter.MyViewHolder> {
+public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHolder> {
 
-    private List<TVSkeleton> tvSkeletons;
+    private List<Movie> movies;
     private Context mContext;
-    private String imageURL = "https://image.tmdb.org/t/p/w320";
+
     /**
      * ViewHolder
      */
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public ImageView thumbnail;
+        public TextView textViewTitle;
+        public TextView textViewSummary;
         public MyViewHolder(View view) {
             super(view);
             thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
@@ -38,11 +43,11 @@ public class TVAdapter extends RecyclerView.Adapter<TVAdapter.MyViewHolder> {
     /**
      *
      * @param context
-     * @param tvSkeletons
+     * @param movies
      */
-    public TVAdapter(Context context, List<TVSkeleton> tvSkeletons) {
+    public GalleryAdapter(Context context, List<Movie> movies) {
         mContext = context;
-        this.tvSkeletons = tvSkeletons;
+        this.movies = movies;
     }
 
     @Override
@@ -55,9 +60,9 @@ public class TVAdapter extends RecyclerView.Adapter<TVAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        TVSkeleton tv = tvSkeletons.get(position);
+        Movie movie = movies.get(position);
 
-        Glide.with(mContext).load(imageURL+tv.getPoster_Path())
+        Glide.with(mContext).load(movie.getMedium())
                 .thumbnail(0.5f)
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -66,7 +71,7 @@ public class TVAdapter extends RecyclerView.Adapter<TVAdapter.MyViewHolder> {
 
     @Override
     public int getItemCount() {
-        return tvSkeletons.size();
+        return movies.size();
     }
 
     public interface ClickListener {
@@ -81,9 +86,9 @@ public class TVAdapter extends RecyclerView.Adapter<TVAdapter.MyViewHolder> {
     public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
         private GestureDetector gestureDetector;
-        private TVAdapter.ClickListener clickListener;
+        private GalleryAdapter.ClickListener clickListener;
 
-        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final TVAdapter.ClickListener clickListener) {
+        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final GalleryAdapter.ClickListener clickListener) {
             this.clickListener = clickListener;
             gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override

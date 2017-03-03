@@ -1,4 +1,4 @@
-package com.death.yttorrents;
+package com.death.yttorrents.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,10 +8,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.death.yttorrents.R;
+import com.death.yttorrents.model.TVSkeleton;
 
 import java.util.List;
 
@@ -19,9 +20,9 @@ import java.util.List;
  * Created by sidhantrajora on 07/07/16.
 */
 
-public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MyViewHolder> {
+public class TVAdapter extends RecyclerView.Adapter<TVAdapter.MyViewHolder> {
 
-    private List<MediaSkeleton> mediaSkeletons;
+    private List<TVSkeleton> tvSkeletons;
     private Context mContext;
     private String imageURL = "https://image.tmdb.org/t/p/w320";
     /**
@@ -39,11 +40,11 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MyViewHolder
     /**
      *
      * @param context
-     * @param mediaSkeletons
+     * @param tvSkeletons
      */
-    public MediaAdapter(Context context, List<MediaSkeleton> mediaSkeletons) {
+    public TVAdapter(Context context, List<TVSkeleton> tvSkeletons) {
         mContext = context;
-        this.mediaSkeletons = mediaSkeletons;
+        this.tvSkeletons = tvSkeletons;
     }
 
     @Override
@@ -56,9 +57,9 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        MediaSkeleton media = mediaSkeletons.get(position);
+        TVSkeleton tv = tvSkeletons.get(position);
 
-        Glide.with(mContext).load(imageURL+media.getPoster_Path())
+        Glide.with(mContext).load(imageURL+tv.getPoster_Path())
                 .thumbnail(0.5f)
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -67,7 +68,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MyViewHolder
 
     @Override
     public int getItemCount() {
-        return mediaSkeletons.size();
+        return tvSkeletons.size();
     }
 
     public interface ClickListener {
@@ -82,9 +83,9 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MyViewHolder
     public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
         private GestureDetector gestureDetector;
-        private MediaAdapter.ClickListener clickListener;
+        private TVAdapter.ClickListener clickListener;
 
-        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final MediaAdapter.ClickListener clickListener) {
+        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final TVAdapter.ClickListener clickListener) {
             this.clickListener = clickListener;
             gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override

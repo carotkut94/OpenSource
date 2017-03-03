@@ -1,11 +1,13 @@
-package com.death.yttorrents;
+package com.death.yttorrents.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,7 +25,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,6 +34,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.death.yttorrents.model.Movie;
+import com.death.yttorrents.R;
+import com.death.yttorrents.adapter.GalleryAdapter;
+import com.death.yttorrents.controller.AppController;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,6 +69,41 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setTitle("YTtorrents");
+
+
+        final SharedPreferences preferences = getSharedPreferences("APPCOUNTER", MODE_APPEND);
+        Boolean isFirstRun = preferences.getBoolean("ISFIRSTRUN", true);
+
+        if(isFirstRun)
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.MyDialogTheme);
+            alertDialogBuilder.setTitle(Html.fromHtml("<font color='#ffffff'>Disclaimer/License</font>"));
+            alertDialogBuilder.setCancelable(true);
+            alertDialogBuilder.setMessage(Html.fromHtml("<font color='#ffffff'>"+getResources().getString(R.string.terms)+"</font>"));
+            alertDialogBuilder.setIcon(R.drawable.ic_icon);
+            alertDialogBuilder.setCancelable(false).setNegativeButton("Cancel",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,
+                                            int id) {
+                            dialog.dismiss();
+                            MainActivity.this.finish();
+                            finishActivity(0);
+                        }
+                    }).setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putBoolean("ISFIRSTRUN", false);
+                    editor.apply();
+                    editor.commit();
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.setCancelable(true);
+            alertDialog.show();
+        }
+
+
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         errorView = (TextView) findViewById(R.id.error);
         pDialog = new ProgressDialog(this);
@@ -202,6 +242,11 @@ public class MainActivity extends AppCompatActivity {
         if(item.getItemId()==R.id.mwiki)
         {
             startActivity(new Intent(MainActivity.this, MediaContainer.class));
+        }
+
+        if(item.getItemId() == R.id.about)
+        {
+            startActivity(new Intent(MainActivity.this, About.class));
         }
         return super.onOptionsItemSelected(item);
     }
