@@ -18,10 +18,10 @@ public class SearchActivity extends AppCompatActivity {
         if(category == "TV")
         {
             hitUrl = "https://api.themoviedb.org/3/search/tv?api_key=56196b3d62369c56461e48dcf3652bf0&language=en-US&query="+query+"&page=1";
+
         }else{
 
             hitUrl = "https://api.themoviedb.org/3/search/movie?api_key=56196b3d62369c56461e48dcf3652bf0&language=en-US&query="+query+"&page=1&include_adult=true";
         }
-
     }
 }
