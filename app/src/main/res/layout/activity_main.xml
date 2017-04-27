@@ -26,17 +26,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"
-        android:text="No Movies Found"
-        android:textSize="40sp"
-        android:textColor="#6AC045"
-        android:textStyle="bold"
-        android:visibility="gone"
-        android:id="@+id/error"
-        android:padding="10dp"
-        android:layout_height="wrap_content" />
     <include layout="@layout/content_main" />
 
 </android.support.design.widget.CoordinatorLayout>

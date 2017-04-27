@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,13 +21,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -40,6 +36,9 @@ import com.death.yttorrents.model.Movie;
 import com.death.yttorrents.R;
 import com.death.yttorrents.adapter.GalleryAdapter;
 import com.death.yttorrents.controller.AppController;
+import com.death.yttorrents.utils.Constants;
+import com.death.yttorrents.utils.GridItemDecoration;
+import com.death.yttorrents.utils.UrlUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,19 +48,15 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String endpoint = "https://yts.ag/api/v2/list_movies.json?limit=50";
+    private static final String endpoint = UrlUtils.getURL();
     RecyclerView.LayoutManager mLayoutManager;
     int count = 0;
     String query;
     private ArrayList<Movie> movies;
     private ProgressDialog pDialog;
     private GalleryAdapter mAdapter;
-    private TextView errorView;
     private RecyclerView recyclerView;
 
-    /**
-     * @param savedInstanceState
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,11 +65,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
-        toolbar.setTitle("YTtorrents");
+        toolbar.setTitle(R.string.app_name);
 
 
-        final SharedPreferences preferences = getSharedPreferences("APPCOUNTER", MODE_APPEND);
-        Boolean isFirstRun = preferences.getBoolean("ISFIRSTRUN", true);
+        final SharedPreferences preferences = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_APPEND);
+        Boolean isFirstRun = preferences.getBoolean(Constants.PREFERENCE_KEY_FOR_FIRSTRUN, true);
 
         if(isFirstRun)
         {
@@ -95,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     SharedPreferences.Editor editor = preferences.edit();
-                    editor.putBoolean("ISFIRSTRUN", false);
+                    editor.putBoolean(Constants.PREFERENCE_KEY_FOR_FIRSTRUN, false);
                     editor.apply();
                     editor.commit();
                 }
@@ -107,13 +102,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        errorView = (TextView) findViewById(R.id.error);
         pDialog = new ProgressDialog(this);
         movies = new ArrayList<>();
         mAdapter = new GalleryAdapter(getApplicationContext(), movies);
 
         mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
+        recyclerView.addItemDecoration(new GridItemDecoration(2, UrlUtils.dpToPx(this,5), true));
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
@@ -140,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
         }));
         fetchMovies(endpoint);
     }
-
     /**
      * @param newConfig
      */
@@ -165,15 +158,15 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
-                Log.e("Permission error", "You have permission");
+                Log.d("Permission Granted", "You have permission");
                 return true;
             } else {
-                Log.e("Permission error", "You have asked for permission");
+                Log.d("Already Asked", "You have asked for permission");
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 return false;
             }
         } else { //you dont need to worry about these stuff below api level 23
-            Log.e("Permission error", "You already have the permission");
+            Log.d("Permission given", "You already have the permission");
             return true;
         }
     }
@@ -262,35 +255,33 @@ public class MainActivity extends AppCompatActivity {
     private void fetchMovies(String url) {
         pDialog.setMessage("Downloading movie list...");
         pDialog.show();
-        errorView.setVisibility(View.INVISIBLE);
         JsonObjectRequest request = new JsonObjectRequest(url, new JSONObject(),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         movies.clear();
                         pDialog.hide();
-                        errorView.setVisibility(View.INVISIBLE);
                         try {
-                            JSONObject object = response.getJSONObject("data");
-                            JSONArray array = object.getJSONArray("movies");
+                            JSONObject object = response.getJSONObject(Constants.ROOT_JSON_OBJECT);
+                            JSONArray array = object.getJSONArray(Constants.ROOT_JSON_ARRAY_NAME);
                             for (int i = 0; i < array.length(); i++) {
                                 JSONObject object2 = array.getJSONObject(i);
                                 Movie movie = new Movie();
-                                movie.setName(object2.getString("title"));
-                                movie.setSmall(object2.getString("small_cover_image"));
-                                movie.setMedium(object2.getString("medium_cover_image"));
-                                movie.setLarge(object2.getString("large_cover_image"));
-                                movie.setTimestamp(object2.getString("date_uploaded"));
-                                movie.setRating(object2.getString("rating"));
-                                movie.setSumary(object2.getString("synopsis"));
-                                JSONArray array3 = object2.getJSONArray("torrents");
+                                movie.setName(object2.getString(Constants.TITLE));
+                                movie.setSmall(object2.getString(Constants.SMALL_COVER_IMAGE));
+                                movie.setMedium(object2.getString(Constants.MEDIUM_COVER_IMAGE));
+                                movie.setLarge(object2.getString(Constants.LARGE_COVER_IMAGE));
+                                movie.setTimestamp(object2.getString(Constants.DATE_UPLOADED));
+                                movie.setRating(object2.getString(Constants.RATING));
+                                movie.setSumary(object2.getString(Constants.SYNOPSIS));
+                                JSONArray array3 = object2.getJSONArray(Constants.TORRENTS);
                                 JSONObject jsonObject = array3.getJSONObject(0);
-                                movie.setURL(jsonObject.getString("url"));
+                                movie.setURL(jsonObject.getString(Constants.URL));
                                 movies.add(movie);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            errorView.setVisibility(View.VISIBLE);
+
                         }
                         mAdapter.notifyDataSetChanged();
                     }
@@ -298,50 +289,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("Error: ", error.getMessage());
-                errorView.setVisibility(View.VISIBLE);
                 pDialog.hide();
             }
         });
         AppController.getInstance().addToRequestQueue(request);
-    }
-
-    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
-
-        private int spanCount;
-        private int spacing;
-        private boolean includeEdge;
-
-        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
-            this.spanCount = spanCount;
-            this.spacing = spacing;
-            this.includeEdge = includeEdge;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            int position = parent.getChildAdapterPosition(view); // item position
-            int column = position % spanCount; // item column
-
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
-                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
-
-                if (position < spanCount) { // top edge
-                    outRect.top = spacing;
-                }
-                outRect.bottom = spacing; // item bottom
-            } else {
-                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
-                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
-                if (position >= spanCount) {
-                    outRect.top = spacing; // item top
-                }
-            }
-        }
-    }
-
-    private int dpToPx(int dp) {
-        Resources r = getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 }
