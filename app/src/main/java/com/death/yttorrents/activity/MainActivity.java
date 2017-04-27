@@ -134,20 +134,6 @@ public class MainActivity extends AppCompatActivity {
         }));
         fetchMovies(endpoint);
     }
-    /**
-     * @param newConfig
-     */
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mLayoutManager = new GridLayoutManager(getApplicationContext(), 4);
-            recyclerView.setLayoutManager(mLayoutManager);
-        } else {
-            mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
-            recyclerView.setLayoutManager(mLayoutManager);
-        }
-        super.onConfigurationChanged(newConfig);
-    }
 
     /**
      * Check for write permissions
